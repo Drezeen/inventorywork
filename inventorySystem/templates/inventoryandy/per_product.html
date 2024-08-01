@@ -1,0 +1,128 @@
+{% extends "../layout.html" %}
+{% block content %}
+<div class="content-section">
+    <div class="row mx-auto justify-content-center">
+
+        <div class="card m-4" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title text-center">Product Name</h5>
+                <div style="font-size: 30px;" class="text-center">
+                    <span><i class="fab fa-product-hunt"></i></span>
+                </div>
+                <h3 class="text-center">{{ inventoryandy.name}}</h3>
+            </div>
+        </div>
+
+        <div class="card m-4" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title text-center">Quantity in Stock</h5>
+                <div style="font-size: 30px;" class="text-center">
+                    <span><i class="fas fa-warehouse"></i></span>
+                </div>
+                <h3 class="text-center">{{ inventoryandy.quantity_in_stock }}</h3>
+            </div>
+        </div>
+
+        <div class="card m-4" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title text-center">Quantity Sold</h5>
+                <div style="font-size: 30px;" class="text-center">
+                    <span><i class="fas fa-warehouse"></i></span>
+                </div>
+                <h3 class="text-center">{{ inventoryandy.quantity_sold}}</h3>
+            </div>
+        </div>
+
+        <div class="card m-4" style="width: 18rem;">
+            <div class="card-body">
+            <h5 class="card-title text-center">Price Per {{ inventoryandy.name}}</h5>
+                <div style="font-size: 30px;" class="text-center">
+                    <span><i class="fas fa-dollar-sign"></i></span>
+                </div>
+                <h3 class="text-center">{{ inventoryandy.cost_per_item}}</h3>
+            </div>
+        </div>
+
+        <div class="card m-4" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title text-center">Sales or Revenue</h5>
+                <div style="font-size: 30px;" class="text-center">
+                    <span><i class="fas fa-dollar-sign"></i></span>
+                </div>
+                <h3 class="text-center">{{ inventoryandy.sales_or_revenue}}</h3>
+            </div>
+        </div>
+
+        <div class="card m-4" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title text-center">Remaining Quantity</h5>
+                <div style="font-size: 30px;" class="text-center">
+                    <span><i class="fas fa-box"></i></span>
+                </div>
+                <h3 class="text-center">{{ inventoryandy.remaining_quantity }}</h3>
+            </div>
+        </div>
+
+        <div class="card m-4" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title text-center">Stock Date</h5>
+                <div style="font-size: 30px;" class="text-center">
+                    <span><i class="fas fa-calendar-alt"></i></span>
+                </div>
+                <h3 class="text-center">{{ inventoryandy.stock_date }}</h3>
+            </div>
+        </div>
+
+        <div class="card m-4" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title text-center">Last sales Date</h5>
+                <div style="font-size: 30px;" class="text-center">
+                    <span><i class="fas fa-calendar-alt"></i></span>
+                </div>
+                <h3 class="text-center">{{ inventoryandy.last_sales_date}}</h3>
+            </div>
+        </div>
+        <form method="post" action="{% url 'add_product' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="barcode">Barcode:</label>
+                <input type="text" class="form-control" id="barcode" name="barcode">
+            </div>
+            <!-- Other input fields for product details -->
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+
+        <div id="barcode-scanner" style="width: 100%;"></div>
+        <div id="scanned-data"></div>
+
+        
+<script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+<script>
+    Quagga.init({
+        inputStream: {
+            name: "ImageStream",
+            src: document.querySelector('#barcode-scanner img').src,
+        },
+        decoder: {
+            readers: ["ean_reader"] // Specify the type of barcode to scan (EAN-13 in this case)
+        }
+    }, function(err) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        Quagga.start();
+    });
+
+    Quagga.onDetected(function(result) {
+        var barcode = result.codeResult.code;
+        // Redirect to the URL for processing the scanned barcode
+        window.location.href = '{% url "update_inventory" pk=inventoryandy.pk %}?barcode=' + barcode;
+    });
+</script>
+        <a class="btn btn-outline-success btn-sm mb-3"href="{% url 'update_inventory' inventoryandy.id %}">Update inventory</a>
+        <a class="btn btn-danger btn-sm "href="{% url 'delete_inventory' inventoryandy.id %}">delete inventory</a>
+    </div>
+    </div>
+</div>
+{% endblock %}
